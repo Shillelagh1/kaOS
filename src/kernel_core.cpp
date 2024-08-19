@@ -1,4 +1,5 @@
 #include "kernel_console.h"
+#include "except.h"
 
 void memory_test(void){
 	__asm__ volatile(
@@ -11,6 +12,6 @@ void memory_test(void){
 
 extern "C" void hl_kernel_postgdt(void){
 	console_initialize();
-	console_printline("Hello, World!\nTest.");
-	memory_test();
+	console_printline("Hello, World!\nTest.\n");
+	except_initialize();
 }

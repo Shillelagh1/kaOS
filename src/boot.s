@@ -5,7 +5,6 @@ MBFLAGS  equ  MBALIGN | MEMINFO
 MAGIC    equ  0x1BADB002
 CHECKSUM equ -(MAGIC + MBFLAGS)
 
-
 section .multiboot
 	align 4
 		dd MAGIC
@@ -21,7 +20,7 @@ section .data
 	GDTR:
 		dw (GDT_SIZE - 1)
 		dq GDT
-
+		
 section .bss
 	align 16
 	stack_bottom:

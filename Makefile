@@ -22,8 +22,14 @@ build:
 
 	@echo
 	#
+	# ==== Interrupt System ====
+	$$HOME/opt/cross/bin/i686-elf-g++ -c src/except.cpp -o tmp/except.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
+	nasm -felf32 src/except.s -o tmp/sexcept.o
+
+	@echo
+	#
 	# ==== Linking ====
-	$$HOME/opt/cross/bin/i686-elf-gcc -T src/LINKER.ld -o tmp/kaOS.bin -ffreestanding -nostdlib tmp/boot.o tmp/kernel_core.o tmp/libc.o tmp/kernel_console.o -lgcc
+	$$HOME/opt/cross/bin/i686-elf-gcc -T src/LINKER.ld -o tmp/kaOS.bin -ffreestanding -nostdlib tmp/boot.o tmp/kernel_core.o tmp/libc.o tmp/kernel_console.o tmp/except.o tmp/sexcept.o -lgcc
 
 	@echo
 	#

@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include "libc.h"
 
-
 #define CONSOLE_W 80
 #define CONSOLE_H 25
 
@@ -63,4 +62,28 @@ extern "C" void console_printline(char* string, int col, int row, uint8_t color)
 		cursor_row = row;
 		console_putcursor(cursor_col, cursor_row);
 	}
+}
+
+extern "C" void console_printint(int val, int base, uint8_t col){
+	if (val < 0 && base == 10){
+		console_putchar('-', -1, -1, col);
+		cursor_col ++;
+		if(cursor_col >= CONSOLE_W){
+			cursor_col = 0;
+			cursor_row ++;
+		}
+	}
+	
+	char ch;
+	while (val){
+		ch = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + val % base];
+		val /= base;
+		console_putchar(ch, -1, -1, col);
+		cursor_col ++;
+		if(cursor_col >= CONSOLE_W){
+			cursor_col = 0;
+			cursor_row ++;
+		}
+	}
+	console_putcursor(cursor_col, cursor_row);
 }
