@@ -1,17 +1,14 @@
 #include "kernel_console.h"
 #include "except.h"
 
-void memory_test(void){
-	__asm__ volatile(
-		"push %eax\n\t"
-		"mov $0xE801, %ax\n\t"
-		"int $0x15\n\t"
-		"pop %eax\n\t"
-	);
-}
+#define KERNEL_VERSION "v0.0.3"
+#define KERNEL_INTRO_MSG ("==== kaOS kernel (" KERNEL_VERSION ") ====")
 
 extern "C" void hl_kernel_postgdt(void){
 	console_initialize();
-	console_printline("Hello, World!\nTest.\n");
-	except_initialize();
+	
+	except_initialize();			// Interrupts & PICs setup
+	
+	console_printline(KERNEL_INTRO_MSG);
+	console_printline("\n");		// Introduction message
 }

@@ -24,7 +24,7 @@ extern "C" void console_initialize(){
 	cursor_row = 0;
 }
 
-extern "C" void console_putchar(char ch, int col, int row, uint8_t color){
+extern "C" void console_putchar(char ch, int col=-1, int row=-1, uint8_t color=0x0F){
 	if (col < 0) col = cursor_col;
 	if (row < 0) row = cursor_row;
 
@@ -33,7 +33,7 @@ extern "C" void console_putchar(char ch, int col, int row, uint8_t color){
 	console_buf[col + row * CONSOLE_W] = to_place;
 }
 
-extern "C" void console_printline(char* string, int col, int row, uint8_t color){
+extern "C" void console_printline(char* string, int col=-1, int row=-1, uint8_t color=0x0F){
 	bool update_cursor = false;
 	if (col < 0 || row < 0){
 		col = cursor_col;
@@ -64,26 +64,58 @@ extern "C" void console_printline(char* string, int col, int row, uint8_t color)
 	}
 }
 
-extern "C" void console_printint(int val, int base, uint8_t col){
+extern "C" void console_printint(int val, int base, uint8_t color){	
+	if (val == 0){
+		console_printline("0");
+		return;
+	}
+
+	// Print negative sign.
 	if (val < 0 && base == 10){
-		console_putchar('-', -1, -1, col);
+		console_putchar('-');
 		cursor_col ++;
-		if(cursor_col >= CONSOLE_W){
+		if(cursor_col >= CONSOLE_W){	// Forward Wrap.
 			cursor_col = 0;
 			cursor_row ++;
 		}
 	}
 	
+	// TODO: Come up with a better way? This is very expensive.
+	// Determine the number of characters we need to forward step.
+	int numchars = 0;
+	int tval = val;
+	while (tval){
+		tval /= base;
+		numchars ++;
+	}
+	
+	// Step forward to the end of where the number will be.
+	cursor_col += numchars - 1;
+	if (cursor_col >= CONSOLE_W){	// Forward Wrap.
+		cursor_col = 0;
+		cursor_row ++;
+	}
+	
+	int ecol = cursor_col + 1;
+	int erow = cursor_row;
+	console_putcursor(cursor_col + 1, cursor_row);
+	
+	// Begin printing the number from right to left.
 	char ch;
 	while (val){
+		// Decide which character to print.
 		ch = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + val % base];
 		val /= base;
-		console_putchar(ch, -1, -1, col);
-		cursor_col ++;
-		if(cursor_col >= CONSOLE_W){
-			cursor_col = 0;
-			cursor_row ++;
+		console_putchar(ch);
+		
+		// Step backwards.
+		cursor_col --;
+		if (cursor_col < 0){	// Negative Wrap.
+			cursor_row --;
+			cursor_col = CONSOLE_W - 1;
 		}
 	}
-	console_putcursor(cursor_col, cursor_row);
+	
+	cursor_col = ecol;
+	cursor_row = erow;
 }

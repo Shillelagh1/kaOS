@@ -1,15 +1,27 @@
 %macro isr_err_stub 1
 isr_stub_%+%1:
-    call EXCEPTION_DEFAULT
-    iret 
+	mov eax, [esp]
+	
+	push eax
+	push %1
+    	call EXCEPTION_ERR
+    	pop eax
+    	pop eax
+    	
+    	pop eax
+    	iret
 %endmacro
 %macro isr_no_err_stub 1
 isr_stub_%+%1:
-    call EXCEPTION_DEFAULT
-    iret
+	push %1
+    	call EXCEPTION_NOERR
+    	pop eax
+    	
+    	iret
 %endmacro
 
-extern EXCEPTION_DEFAULT
+extern EXCEPTION_ERR
+extern EXCEPTION_NOERR
 isr_no_err_stub 0
 isr_no_err_stub 1
 isr_no_err_stub 2
@@ -47,14 +59,41 @@ global isr_stub_table
 isr_stub_table:
 %assign i 0 
 %rep    32 
-    dd isr_stub_%+i
+    	dd isr_stub_%+i
 %assign i i+1 
 %endrep
 
+; Load the IDTR
 global _lodidt
 _lodidt:
 	mov eax, [esp + 4]
 	lidt [eax]
-	sti
-	xchg bx, bx
+	ret
+	
+; Initialize the PICs
+global _picinit
+_picinit:
+	
+	mov al, 0x11
+	out 0x20, al
+	out 0xA0, al	; Make PICs listen
+	
+	mov al, 0x20
+	out 0x21, al
+	mov al, 0x28
+	out 0xA1, al	; Set offset
+	
+	mov al, 4
+	out 0x21, al
+	mov al, 2
+	out 0xA1, al	; Configure for slavery
+	
+	mov al, 1
+	out 0xA1, al
+	out 0x21, al	; Configure to 8086
+	
+	mov al, 0xFF
+	out 0x21, al
+	out 0xA1, al
+	
 	ret

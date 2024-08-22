@@ -51,6 +51,9 @@ build:
 run: build
 	qemu-system-i386 -cdrom bin/kaOS.iso -monitor stdio
 
+urn: run
+	@#
+
 exp: build
 	-rm /media/sf_shared/kaOS.iso
 	cp bin/kaOS.iso /media/sf_shared/kaOS.iso
