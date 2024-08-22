@@ -34,6 +34,7 @@ extern "C" void console_putchar(char ch, int col=-1, int row=-1, uint8_t color=0
 }
 
 extern "C" void console_printline(char* string, int col=-1, int row=-1, uint8_t color=0x0F){
+	// Determine if we are printing a line in a custom location or at the end of the console stream
 	bool update_cursor = false;
 	if (col < 0 || row < 0){
 		col = cursor_col;
@@ -41,6 +42,7 @@ extern "C" void console_printline(char* string, int col=-1, int row=-1, uint8_t 
 		update_cursor = true;
 	} 
 	
+	// Print the string
 	for (int i = 0; string[i]; i++){
 		switch (string[i]){
 			case '\n':

@@ -4,24 +4,7 @@
 #include "libc.h"
 #include "kernel_console.h"
 
-#define PIC1		0x20
-#define PIC2		0xA0
-#define PIC1_DATA 	(PIC1+1)
-#define PIC2_DATA	(PIC2+1)
-
 #define IDT_MAX_VECTORS 256
-
-typedef struct {
-	uint16_t isr_0;
-	uint16_t CS;
-	uint8_t zero;
-	uint8_t attributes;
-	uint16_t isr_1;
-}
-__attribute__((packed)) interrupt_descriptor_t;
-
-__attribute__((aligned(0x10)))
-static interrupt_descriptor_t idt[IDT_MAX_VECTORS];
 
 // Display names for the first 32 interrupts
 char* errorDescriptions[]{
@@ -59,6 +42,18 @@ char* errorDescriptions[]{
 	"1Fh",	// 31, reserved
 };
 
+typedef struct {
+	uint16_t isr_0;
+	uint16_t CS;
+	uint8_t zero;
+	uint8_t attributes;
+	uint16_t isr_1;
+}
+__attribute__((packed)) interrupt_descriptor_t;
+
+__attribute__((aligned(0x10)))
+static interrupt_descriptor_t idt[IDT_MAX_VECTORS];
+
 struct {
 	uint16_t limit;
 	uint32_t base;
@@ -75,15 +70,17 @@ void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
     descriptor->zero       	= 0;
 }
 
+extern "C" void* isr_stub_table[];
+
+extern "C" void _lodidt(uint32_t idt);
+extern "C" void _picinit();
+
+static bool vectors[IDT_MAX_VECTORS]; 
+
 inline void wait(){
 	outb(0x80, 0);
 }
 
-static bool vectors[IDT_MAX_VECTORS]; 
-
-extern "C" void* isr_stub_table[];
-extern "C" void _lodidt(uint32_t idt);
-extern "C" void _picinit();
 extern "C" void except_initialize(){	
 	// Disable interrupts
 	asm("cli");
@@ -163,6 +160,7 @@ extern "C" void EXCEPTION_ERR(uint32_t val, uint32_t err){
 		break;
 	}
 	
+	// TODO: Determine which errors are recoverable and proceed accordingly.
 	asm("cli");
 	asm("hlt");
 }
@@ -171,6 +169,7 @@ extern "C" void EXCEPTION_ERR(uint32_t val, uint32_t err){
 extern "C" void EXCEPTION_NOERR(uint32_t val){
 	EXCEPTION_COMMON(val);
 	
+	// TODO: Ditto {ln.163}
 	asm("cli");
 	asm("hlt");
 }

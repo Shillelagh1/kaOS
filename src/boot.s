@@ -48,7 +48,7 @@ section .text
 		call hl_kernel_postgdt
 
 		; Don't fall out
-		xchg bx, bx
+		xchg bx, bx	; Breakpoint for Bochs
 	exit:	cli
 	.l:	hlt
 		jmp .l

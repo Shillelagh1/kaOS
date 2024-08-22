@@ -1,22 +1,27 @@
 %macro isr_err_stub 1
 isr_stub_%+%1:
-	mov eax, [esp]
+	pushad			; Preserve general purpose registers
+	mov eax, [esp+32]	; Get the error code off the stack
 	
 	push eax
 	push %1
     	call EXCEPTION_ERR
     	pop eax
-    	pop eax
+    	pop eax			; Call Handler
     	
+    	popad
     	pop eax
-    	iret
+    	iret			; Cleanup & Return
 %endmacro
 %macro isr_no_err_stub 1
 isr_stub_%+%1:
+	pushad			; Preserve general purpose registers
+
 	push %1
     	call EXCEPTION_NOERR
-    	pop eax
-    	
+    	pop eax			; Call Handler
+
+    	popad
     	iret
 %endmacro
 
