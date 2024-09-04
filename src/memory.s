@@ -27,6 +27,6 @@ _mTest:
     mov edx, 0x534D4150
     mov eax, 0xE820
     mov ecx, 24
-    int 0x14          ; 0xE820 interrupt
+    int 0x15            ; 0xE820 interrupt
 
     ret
