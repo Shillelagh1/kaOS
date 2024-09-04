@@ -17,8 +17,16 @@ build:
 
 	@echo
 	#
+	#
+	# ==== Memory ====
+	$$HOME/opt/cross/bin/i686-elf-g++ -c src/memory.cpp -o tmp/memory.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
+	nasm -felf32 src/memory.s -o tmp/smemory.o
+
+	@echo
+	#
 	# ==== Libc ====
 	$$HOME/opt/cross/bin/i686-elf-g++ -c src/libc.cpp -o tmp/libc.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
+	nasm -felf32 src/libc.s -o tmp/slibc.o
 
 	@echo
 	#
@@ -29,7 +37,7 @@ build:
 	@echo
 	#
 	# ==== Linking ====
-	$$HOME/opt/cross/bin/i686-elf-gcc -T src/LINKER.ld -o tmp/kaOS.bin -ffreestanding -nostdlib tmp/boot.o tmp/kernel_core.o tmp/libc.o tmp/kernel_console.o tmp/except.o tmp/sexcept.o -lgcc
+	$$HOME/opt/cross/bin/i686-elf-gcc -T src/LINKER.ld -o tmp/kaOS.bin -ffreestanding -nostdlib tmp/boot.o tmp/kernel_core.o tmp/libc.o tmp/slibc.o tmp/kernel_console.o tmp/except.o tmp/sexcept.o tmp/memory.o tmp/smemory.o -lgcc
 
 	@echo
 	#

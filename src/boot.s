@@ -1,3 +1,5 @@
+bits 32
+
 ; Built on the Bare Bones boot file template from 'wiki.osdev.org'
 MBALIGN  equ  1 << 0
 MEMINFO  equ  1 << 1
@@ -35,7 +37,7 @@ section .text
 
 		; Apply GDTR
 		jmp 0x08:.CS
-	.CS
+	.CS:
 		mov ax, 0x10
 		mov ds, ax
 		mov es, ax

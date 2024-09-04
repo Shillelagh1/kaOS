@@ -1,3 +1,6 @@
+bits 32
+section .text
+
 %macro isr_err_stub 1
 isr_stub_%+%1:
 	pushad			; Preserve general purpose registers
