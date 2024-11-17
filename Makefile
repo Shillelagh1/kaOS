@@ -9,6 +9,8 @@ build:
 	#
 	# ==== Kernel Core ====
 	$$HOME/opt/cross/bin/i686-elf-g++ -c src/kernel_core.cpp -o tmp/kernel_core.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
+	
+	nasm -fbin src/mode_switch.s -o tmp/modeswitch.o
 
 	@echo
 	#
@@ -37,7 +39,7 @@ build:
 	@echo
 	#
 	# ==== Linking ====
-	$$HOME/opt/cross/bin/i686-elf-gcc -T src/LINKER.ld -o tmp/kaOS.bin -ffreestanding -nostdlib tmp/boot.o tmp/kernel_core.o tmp/libc.o tmp/slibc.o tmp/kernel_console.o tmp/except.o tmp/sexcept.o tmp/memory.o tmp/smemory.o -lgcc
+	$$HOME/opt/cross/bin/i686-elf-gcc -T src/LINKER.ld -o tmp/kaOS.bin -ffreestanding -nostdlib tmp/modeswitch.o tmp/boot.o tmp/kernel_core.o tmp/libc.o tmp/slibc.o tmp/kernel_console.o tmp/except.o tmp/sexcept.o tmp/memory.o tmp/smemory.o -lgcc
 
 	@echo
 	#

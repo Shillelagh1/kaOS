@@ -14,14 +14,15 @@ section .multiboot
 		dd CHECKSUM
 
 section .data
-	GDT:
+	global KaOS_GDT
+	KaOS_GDT:
 		dd 0x00000000, 0x00000000 ; NULL
 		dd 0x0000ffff, 0x00df9f00 ; EXEC 0
 		dd 0x0000ffff, 0x00df9300 ; DATA 0
-		GDT_SIZE: equ $ - GDT
-	GDTR:
-		dw (GDT_SIZE - 1)
-		dq GDT
+		KaOS_GDT_SIZE: equ $ - KaOS_GDT
+	KaOS_GDTR:
+		dw (KaOS_GDT_SIZE - 1)
+		dq KaOS_GDT
 		
 section .bss
 	align 16
@@ -33,7 +34,7 @@ section .text
 	global _start
 	_start:
 		; Load GDTR
-		lgdt [GDTR]
+		lgdt [KaOS_GDTR]
 
 		; Apply GDTR
 		jmp 0x08:.CS

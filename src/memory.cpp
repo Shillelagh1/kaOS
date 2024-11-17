@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "kernel_console.h"
+#include "libc.h"
 
 uint32_t resp;
 
@@ -44,4 +45,10 @@ extern "C" void memory_init(){
     _loadPageDir((uint32_t)page_dir);
 
     // TODO: Memory Test
+}
+
+void memory_test(){
+    enterRealMode();        // Real mode required as we are about to make a BIOS call.
+    _mTest(resp);           // 0xE820 0x15 BIOS call
+    enterProtectedMode();
 }
